@@ -1,0 +1,35 @@
+dataset:
+  name: VireoFood172
+  type: imagefolder
+  data_root: /path/to/VireoFood172
+  train_dir: /path/to/VireoFood172/train
+  val_dir: /path/to/VireoFood172/val
+  train_txt: /path/to/VireoFood172/train_list.txt
+  val_txt: /path/to/VireoFood172/val_list.txt
+
+model:
+  backbone: dinov3_l
+  img_size: 224
+  num_queries: 8
+  num_heads: 8
+  hfta_bottleneck: 64
+  use_hfta: true
+
+training:
+  epochs: 50
+  # Total physical batch size before DataParallel split.
+  batch_size: 64
+  lr: 5.0e-4
+  weight_decay: 1.0e-4
+  seed: 42
+  amp: true
+  grad_clip_norm: 1.0
+  lambda_ortho_max: 0.03
+  lambda_ortho_warmup_epochs: 10
+
+paths:
+  exp_name: train_FITFoodNet_Vireo172
+  dinov3_repo: /path/to/dinov3
+  dinov3_source: local
+  dinov3_weight: /path/to/dinov3_vitl16_pretrain.pth
+  output_dir: outputs/vireo172_fitfoodnet

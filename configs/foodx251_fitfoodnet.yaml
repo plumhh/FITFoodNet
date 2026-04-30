@@ -1,0 +1,39 @@
+dataset:
+  name: FoodX-251
+  type: csv
+  data_root: /path/to/FoodX251
+  train_csv: /path/to/FoodX251/train_labels.csv
+  val_csv: /path/to/FoodX251/val_labels.csv
+  class_list: /path/to/FoodX251/class_list.txt
+  image_dirs:
+    - /path/to/FoodX251/train
+    - /path/to/FoodX251/val
+    - /path/to/FoodX251/test_set
+    - /path/to/FoodX251
+
+model:
+  backbone: dinov3_l
+  img_size: 224
+  num_queries: 8
+  num_heads: 8
+  hfta_bottleneck: 64
+  use_hfta: true
+
+training:
+  epochs: 50
+  # Total physical batch size before DataParallel split.
+  batch_size: 64
+  lr: 5.0e-4
+  weight_decay: 1.0e-4
+  seed: 42
+  amp: true
+  grad_clip_norm: 1.0
+  lambda_ortho_max: 0.03
+  lambda_ortho_warmup_epochs: 10
+
+paths:
+  exp_name: train_FITFoodNet_FoodX251
+  dinov3_repo: /path/to/dinov3
+  dinov3_source: local
+  dinov3_weight: /path/to/dinov3_vitl16_pretrain.pth
+  output_dir: outputs/foodx251_fitfoodnet

@@ -1,0 +1,39 @@
+# Example AdaptFormer baseline config. Update dataset paths before running.
+dataset:
+  name: FoodX-251
+  type: csv
+  data_root: /path/to/FoodX251
+  train_csv: /path/to/FoodX251/train_labels.csv
+  val_csv: /path/to/FoodX251/val_labels.csv
+  class_list: /path/to/FoodX251/class_list.txt
+  image_dirs:
+    - /path/to/FoodX251/train
+    - /path/to/FoodX251/val
+    - /path/to/FoodX251/test_set
+    - /path/to/FoodX251
+
+model:
+  baseline_method: adaptformer
+  backbone: dinov3_l
+  img_size: 224
+  insert_layers: [5, 11, 17, 23]
+  adapter_dim: 64
+  adapter_dropout: 0.0
+  adapter_scale: 1.0e-4
+  dinov3_repo: /path/to/dinov3
+  dinov3_source: local
+  dinov3_weight: /path/to/dinov3_vitl16_pretrain.pth
+
+training:
+  epochs: 50
+  # Total physical batch size before DataParallel split.
+  batch_size: 64
+  lr: 5.0e-4
+  weight_decay: 1.0e-4
+  seed: 42
+  amp: true
+  grad_clip_norm: 0.5
+
+paths:
+  exp_name: adaptformer_foodx251
+  output_dir: outputs/foodx251_adaptformer

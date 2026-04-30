@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITFoodNet FoodApp Prototype</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="shell">
+        <section class="phone">
+            <header>
+                <p class="eyebrow">FITFoodNet Prototype</p>
+                <h1>Food Recognition</h1>
+                <p id="status">Checking service status...</p>
+            </header>
+
+            <section class="preview">
+                <img id="preview-image" alt="Uploaded food preview">
+                <div>
+                    <p class="eyebrow">Current Result</p>
+                    <h2 id="dish-title">Awaiting image</h2>
+                    <p id="dish-subtitle">Upload a food image and run analysis.</p>
+                </div>
+            </section>
+
+            <section class="controls">
+                <input id="image-input" type="file" accept="image/*">
+                <button id="analyze-button" type="button">Run Analysis</button>
+            </section>
+
+            <section class="chat">
+                <div id="chat-log" class="chat-log"></div>
+                <div class="chips">
+                    <button type="button" data-prompt="How many calories might this dish have?">Calories</button>
+                    <button type="button" data-prompt="What ingredients are likely in this dish?">Ingredients</button>
+                    <button type="button" data-prompt="Give one short nutrition suggestion.">Nutrition</button>
+                </div>
+                <form id="chat-form">
+                    <input id="chat-input" type="text" placeholder="Ask a follow-up question...">
+                    <button id="send-button" type="submit">Ask</button>
+                </form>
+            </section>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
