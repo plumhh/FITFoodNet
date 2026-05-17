@@ -1,55 +1,274 @@
 # FITFoodNet
 
-Official code organization workspace for:
+Official implementation for the manuscript submitted to **The Visual Computer**:
 
-**FITFoodNet: Frequency-Aware Texture Adaptation with Dynamic Ingredient-Aware Modeling for Fine-Grained Food Image Classification**
+**Frequency-Aware Adaptive Modeling for Fine-Grained Food Visual Recognition**
 
-This repository contains FITFoodNet, the High-Frequency Texture Adapter (HFTA), the Dynamic Ingredient-Aware Head (DIA Head), training and validation/evaluation scripts, robustness evaluation, memory profiling, visualization tools, and DINOv3 baseline/PEFT comparison scripts.
+This repository is directly associated with the above manuscript. If you use this code, benchmark protocol, or reproduced results, please cite the related manuscript. A formal BibTeX entry and archival DOI will be updated after the final preprint/publication or Zenodo release is available.
 
-## Repository Status
+## What This Repository Provides
 
-This directory is being prepared for public release. Local absolute paths, private logs, datasets, and pretrained weights should not be committed.
+- FITFoodNet implementation with a frozen DINOv3 backbone.
+- High-Frequency Texture Adapter (HFTA).
+- Dynamic Ingredient-Aware Head (DIA Head).
+- Frequency cross-attention and query-orthogonality loss.
+- Training scripts for FoodX-251 and VireoFood172.
+- Clean validation/evaluation scripts.
+- Robustness evaluation under Gaussian blur and JPEG compression.
+- Parameter, peak-memory, latency, and throughput profiling tools.
+- Occlusion-based feature sensitivity and dynamic-query heatmap visualization.
+- DINOv3 linear probe, full fine-tuning, Adapter, and AdaptFormer comparison scripts.
+- A lightweight FoodApp prototype used only to demonstrate the application scenario.
 
-## Structure
+## Repository Structure
 
 ```text
-FITFoodNet_OpenSource/
-|-- configs/
-|-- docs/
-|-- examples/
-|-- fitfoodnet/
-|-- scripts/
-|-- tools/
-|-- README.md
-|-- requirements.txt
-|-- environment.yml
-`-- .gitignore
+FITFoodNet/
+|-- configs/                    # Dataset/model/training configs
+|-- docs/                       # Environment, data, and reproduction notes
+|-- examples/foodapp_prototype/ # Optional application prototype
+|-- fitfoodnet/                 # Model implementation
+|-- scripts/                    # Reproducible shell entrypoints
+|-- tools/                      # Training, evaluation, profiling, visualization
+|-- CITATION.cff                # Citation metadata
+|-- environment.yml             # Conda environment
+|-- requirements.txt            # Pip requirements
+`-- README.md
 ```
 
-## Released Components
+## Environment
 
-- FITFoodNet model implementation.
-- HFTA module.
-- DIA Head and frequency cross-attention.
-- Orthogonality loss.
-- Dataset loaders for FoodX-251 and VireoFood172.
-- FITFoodNet training script.
-- DINOv3 linear-probe, full-finetuning, Adapter, and AdaptFormer baseline training script.
-- Clean validation/evaluation script.
-- Robustness evaluation under Gaussian blur and JPEG compression.
-- Parameter and peak-memory profiling script.
-- Occlusion and dynamic-query heatmap visualization script.
-- Lightweight FoodApp prototype for the application scenario.
+The reported experiments were run with:
 
-## Important Training Convention
+- Python 3.10
+- PyTorch 2.5.1+cu121
+- CUDA runtime used by PyTorch: 12.1
+- GPUs: 3 x NVIDIA GeForce RTX 2080 Ti
+- Input resolution: 224 x 224
+- Automatic mixed precision enabled
 
-The `batch_size` option denotes the total physical batch size passed to the PyTorch `DataLoader` before `DataParallel` splits the mini-batch across GPUs. In the paper setting, FITFoodNet is trained with a total physical batch size of 64 on three NVIDIA GeForce RTX 2080 Ti GPUs. It does not mean 64 images per GPU.
+Create the conda environment:
 
-## Evaluation Split
+```bash
+conda env create -f environment.yml
+conda activate fitfoodnet
+```
 
-The reported FoodX-251 and VireoFood172 metrics are computed on fixed validation/evaluation splits prepared from the official datasets. They should not be described as hidden test-set results.
+Or install dependencies with pip:
 
-## Main Results
+```bash
+pip install -r requirements.txt
+```
+
+More environment details are provided in `docs/environment.md`.
+
+## Data Preparation
+
+This repository does not redistribute FoodX-251, VireoFood172, dataset images, or DINOv3 pretrained weights. Please download them from the official sources and follow their licenses or academic access agreements.
+
+### FoodX-251
+
+Expected structure:
+
+```text
+FoodX251/
+|-- train/
+|-- val/
+|-- test_set/
+|-- train_labels.csv
+|-- val_labels.csv
+`-- class_list.txt
+```
+
+The CSV files should contain:
+
+```csv
+img_name,label
+example.jpg,0
+```
+
+### VireoFood172
+
+ImageFolder layout:
+
+```text
+VireoFood172/
+|-- train/
+|   |-- class_000/
+|   `-- ...
+`-- val/
+    |-- class_000/
+    `-- ...
+```
+
+TXT-list layout is also supported:
+
+```text
+train_list.txt
+val_list.txt
+```
+
+Each line should contain:
+
+```text
+relative_image_path label
+```
+
+Detailed notes are in `docs/data_preparation.md`.
+
+## Configure Local Paths
+
+Before running experiments, edit:
+
+```text
+configs/foodx251_fitfoodnet.yaml
+configs/vireo172_fitfoodnet.yaml
+```
+
+Set the following fields:
+
+- `data_root`
+- `train_dir`, `val_dir`, or list/CSV files
+- `image_dirs`
+- `dinov3_repo`
+- `dinov3_source`
+- `dinov3_weight`
+- `output_dir`
+
+`dinov3_weight` should point to the official DINOv3 pretrained checkpoint downloaded by the user.
+
+## Training FITFoodNet
+
+FoodX-251:
+
+```bash
+bash scripts/train_foodx251.sh
+```
+
+VireoFood172:
+
+```bash
+bash scripts/train_vireo172.sh
+```
+
+Important convention: `batch_size` is the **total physical batch size** passed to the PyTorch `DataLoader` before `DataParallel` splits it across GPUs. In the paper setting, the total physical batch size is 64 on three RTX 2080 Ti GPUs. It is not 64 images per GPU.
+
+## Clean Validation Evaluation
+
+FoodX-251:
+
+```bash
+bash scripts/evaluate_foodx251.sh
+```
+
+VireoFood172:
+
+```bash
+bash scripts/evaluate_vireo172.sh
+```
+
+Evaluate a custom checkpoint:
+
+```bash
+python tools/evaluate.py \
+  --config configs/vireo172_fitfoodnet.yaml \
+  --checkpoint /path/to/fitfoodnet_best.pth \
+  --output_json outputs/vireo172_fitfoodnet/eval.json
+```
+
+The paper reports metrics on official validation/evaluation splits, not hidden test sets. Reported metrics are accuracy, macro-precision, macro-recall, and macro-F1.
+
+## Baseline and PEFT Comparisons
+
+Run DINOv3-L comparison methods:
+
+```bash
+bash scripts/train_linear_probe_foodx251.sh
+bash scripts/train_linear_probe_vireo172.sh
+bash scripts/train_full_finetune_foodx251.sh
+bash scripts/train_full_finetune_vireo172.sh
+bash scripts/train_adaptformer_foodx251.sh
+bash scripts/train_adaptformer_vireo172.sh
+```
+
+For full fine-tuning, the paper reports the best validation result among the tested learning rates under the same training budget. To reproduce this protocol, run `tools/train_baseline.py` with candidate learning rates and select the best validation checkpoint.
+
+## Robustness Evaluation
+
+The robustness experiment uses:
+
+- Gaussian blur: kernel size 7, sigma 1.5
+- JPEG compression: quality factor 30
+
+Run:
+
+```bash
+bash scripts/evaluate_robustness_foodx251.sh
+bash scripts/evaluate_robustness_vireo172.sh
+```
+
+For the w/o HFTA counterpart:
+
+```bash
+python tools/evaluate_blur_jpeg.py \
+  --config configs/vireo172_fitfoodnet.yaml \
+  --no-use_hfta \
+  --checkpoint /path/to/wo_hfta_checkpoint.pth
+```
+
+## Parameter, Memory, Latency, and FPS Profiling
+
+Peak training memory and parameter counts:
+
+```bash
+bash scripts/profile_memory_vireo172.sh
+```
+
+Inference latency and throughput:
+
+```bash
+bash scripts/profile_inference_vireo172.sh
+```
+
+Equivalent direct command:
+
+```bash
+python tools/profile_inference.py \
+  --config configs/vireo172_fitfoodnet.yaml \
+  --model_kind fitfoodnet \
+  --checkpoint /path/to/fitfoodnet_best.pth \
+  --batch_size 1 \
+  --throughput_batch_size 64 \
+  --warmup_iters 50 \
+  --measure_iters 200 \
+  --output_json outputs/vireo172_fitfoodnet/profile_inference.json
+```
+
+The profiling script uses random tensors with the same input size and excludes data loading and image preprocessing, matching the paper's inference-speed reporting convention.
+
+## Occlusion and Dynamic-Query Heatmap Visualization
+
+Generate qualitative visualizations:
+
+```bash
+bash scripts/visualize_queries_vireo172.sh
+```
+
+Default settings match the manuscript:
+
+- occlusion patch size: 24
+- stride: 8
+- occluded-region brightness factor: 0.60
+- top-k query heatmaps: 2
+
+The generated panels include:
+
+- original image
+- occlusion-based feature sensitivity heatmap
+- top-1 dynamic-query attention heatmap
+- top-2 dynamic-query attention heatmap
+
+## Main Reproduced Results
 
 | Method | Epochs | Resolution | FoodX-251 Acc. (%) | FoodX-251 Pre. (%) | FoodX-251 F1 (%) | VireoFood172 Acc. (%) | VireoFood172 Pre. (%) | VireoFood172 F1 (%) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -76,65 +295,38 @@ The reported FoodX-251 and VireoFood172 metrics are computed on fixed validation
 | AlsmViT-L | 50 | 224 x 224 | - | - | - | 94.29 | 94.29 | 94.25 |
 | **FITFoodNet (Ours)** | **50** | **224 x 224** | **84.65** | **83.92** | **83.62** | **95.38** | **95.41** | **95.44** |
 
-FITFoodNet achieves 84.65% accuracy on FoodX-251 and 95.38% accuracy on VireoFood172 under the paper setting.
+## Checkpoints and Pretrained Weights
 
-## Quick Start
+This repository does not include large model weights in Git history.
 
-Create the conda environment:
+- DINOv3 pretrained weights must be downloaded from the official DINOv3 source.
+- Dataset images are not redistributed.
+- Trained FITFoodNet checkpoints can be reproduced by the training commands above.
+- If model-weight redistribution is permitted by all relevant licenses and storage policies, archival checkpoint links will be provided through GitHub Releases or Zenodo.
 
-```bash
-conda env create -f environment.yml
-conda activate fitfoodnet
-```
+## Additional Documentation
 
-Alternatively, install dependencies with pip:
-
-```bash
-pip install -r requirements.txt
-```
-
-Update the paths in `configs/foodx251_fitfoodnet.yaml` and `configs/vireo172_fitfoodnet.yaml`, especially:
-
-- `data_root`
-- `train_dir`, `val_dir`, or list files
-- `image_dirs`
-- `dinov3_repo`
-- `dinov3_weight`
-
-Train FITFoodNet:
-
-```bash
-bash scripts/train_foodx251.sh
-bash scripts/train_vireo172.sh
-```
-
-Run Table 2 style baseline/adaptation comparisons:
-
-```bash
-bash scripts/train_linear_probe_foodx251.sh
-bash scripts/train_linear_probe_vireo172.sh
-bash scripts/train_full_finetune_foodx251.sh
-bash scripts/train_full_finetune_vireo172.sh
-bash scripts/train_adaptformer_foodx251.sh
-bash scripts/train_adaptformer_vireo172.sh
-```
-
-For full fine-tuning, the paper reports the best validation setting among tested learning rates. Re-run `tools/train_baseline.py` with different `--lr` values and select the best validation result.
-
-## Robustness and Visualization Settings
-
-The robustness script evaluates clean, Gaussian-blur, and JPEG-compressed validation/evaluation images. The default perturbation settings match the paper: Gaussian blur uses kernel size 7 and sigma 1.5, while JPEG compression uses quality 30.
-
-The qualitative visualization script uses occlusion patch size 24, stride 8, and brightness factor 0.60. The top-2 query heatmaps are selected according to the query weights produced by the Query Score branch.
+- `docs/environment.md`: server and dependency details.
+- `docs/data_preparation.md`: dataset layout.
+- `docs/reproduction.md`: detailed reproduction notes.
+- `docs/files_needed_from_author.md`: private files that must not be committed.
 
 ## FoodApp Prototype
 
-A lightweight application prototype is provided in `examples/foodapp_prototype/`. It demonstrates how FITFoodNet can be connected to a prompt builder and an optional LLM interface for mobile-oriented dietary feedback. This prototype is not required for reproducing the benchmark results.
-
-## Data and Pretrained Weights
-
-FoodX-251, VireoFood172, and DINOv3 pretrained weights are not redistributed in this repository. Users should download them from their official sources and configure local paths through command-line arguments or config files.
+`examples/foodapp_prototype/` contains a lightweight prototype showing how FITFoodNet predictions can be connected to a prompt builder and optional large language model interface. This prototype is not required to reproduce benchmark results.
 
 ## Citation
 
-The BibTeX entry will be added after publication or final preprint release.
+If you use this repository, please cite the associated manuscript:
+
+```bibtex
+@article{xiao2026fitfoodnet,
+  title   = {Frequency-Aware Adaptive Modeling for Fine-Grained Food Visual Recognition},
+  author  = {Xiao, Zhiyong and Li, Zihao and Deng, Zhaohong},
+  journal = {The Visual Computer},
+  year    = {2026},
+  note    = {Manuscript submitted}
+}
+```
+
+Please also cite the official datasets and DINOv3 backbone according to their original licenses and citation instructions.
