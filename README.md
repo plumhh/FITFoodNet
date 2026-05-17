@@ -4,7 +4,7 @@ Official implementation for the manuscript submitted to **The Visual Computer**:
 
 **Frequency-Aware Adaptive Modeling for Fine-Grained Food Visual Recognition**
 
-This repository is directly associated with the above manuscript. If you use this code, benchmark protocol, or reproduced results, please cite the related manuscript. A formal BibTeX entry and archival DOI will be updated after the final preprint/publication or Zenodo release is available.
+This repository is directly associated with the above manuscript. If you use this code, benchmark protocol, or reproduced results, please cite the related manuscript. DOI: https://doi.org/10.5281/zenodo.20257839
 
 ## What This Repository Provides
 
