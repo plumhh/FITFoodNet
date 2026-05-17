@@ -122,6 +122,35 @@ Run:
 bash scripts/profile_memory_vireo172.sh
 ```
 
+## Inference Latency and Throughput
+
+The paper reports single-image latency at batch size 1 and throughput at batch
+size 64. The profiling excludes data loading and image preprocessing and uses
+random tensors with the same input size as the validation pipeline.
+
+Run:
+
+```bash
+bash scripts/profile_inference_vireo172.sh
+```
+
+Or call the profiling tool directly:
+
+```bash
+python tools/profile_inference.py \
+  --config configs/vireo172_fitfoodnet.yaml \
+  --model_kind fitfoodnet \
+  --checkpoint /path/to/fitfoodnet_best.pth \
+  --batch_size 1 \
+  --throughput_batch_size 64 \
+  --warmup_iters 50 \
+  --measure_iters 200 \
+  --output_json outputs/vireo172_fitfoodnet/profile_inference.json
+```
+
+For linear-probe, full-finetuning, Adapter, or AdaptFormer baselines, use
+`--model_kind baseline` and set `--baseline_method` accordingly.
+
 ## Qualitative Visualization
 
 The visualization script generates the panel used for qualitative analysis:
