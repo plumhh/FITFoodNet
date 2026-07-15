@@ -2,47 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FITFoodNet FoodApp Prototype</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>FoodLens</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=20260626c">
 </head>
 <body>
-    <main class="shell">
-        <section class="phone">
-            <header>
-                <p class="eyebrow">FITFoodNet Prototype</p>
-                <h1>Food Recognition</h1>
-                <p id="status">Checking service status...</p>
-            </header>
+    <div id="app" class="app">
+        <header class="top-bar">
+            <button id="menu-button" class="icon-button menu-button" type="button" aria-label="Open menu">
+                <span></span><span></span><span></span>
+            </button>
+            <div id="chat-title" class="chat-title" hidden>
+                <strong>FoodLens</strong>
+                <span>Visual food assistant</span>
+            </div>
+            <button id="new-button" class="icon-button new-button" type="button" aria-label="New analysis">+</button>
+        </header>
 
-            <section class="preview">
-                <img id="preview-image" alt="Uploaded food preview">
+        <aside id="drawer" class="drawer" aria-hidden="true">
+            <div class="drawer-head">
                 <div>
-                    <p class="eyebrow">Current Result</p>
-                    <h2 id="dish-title">Awaiting image</h2>
-                    <p id="dish-subtitle">Upload a food image and run analysis.</p>
+                    <h2>FoodLens</h2>
+                    <p>Visual food assistant prototype</p>
                 </div>
+                <button id="close-drawer" class="text-button" type="button">Close</button>
+            </div>
+            <nav class="drawer-nav" aria-label="FoodLens menu">
+                <button type="button" data-action="new">New Analysis</button>
+                <button type="button" data-action="history">History</button>
+                <button type="button" data-action="examples">Example Images</button>
+                <button type="button" data-action="model">Model Information</button>
+                <button type="button" data-action="settings">Settings</button>
+                <button type="button" data-action="about">About</button>
+            </nav>
+            <section class="drawer-section">
+                <h3>Model Information</h3>
+                <div class="info-card"><span>Backbone</span><strong>DINOv3-L</strong></div>
+                <div class="info-card"><span>Method</span><strong>FITFoodNet</strong></div>
+                <div class="info-card"><span>Modules</span><strong>HFTA + DIA Head</strong></div>
+                <div class="info-card"><span>Task</span><strong>Fine-grained food recognition</strong></div>
+            </section>
+        </aside>
+        <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+
+        <main id="main-view" class="main-view">
+            <section id="home-view" class="home-view">
+                <div class="brand-lockup">
+                    <img class="brand-icon" src="{{ url_for('static', filename='foodlens-icon.svg') }}" alt="" onerror="this.style.display='none'">
+                    <div class="fallback-icon" aria-hidden="true">FL</div>
+                    <h1>FoodLens</h1>
+                </div>
+
+                <input id="image-input" type="file" accept="image/*" hidden>
+                <div class="capture-switch" role="group" aria-label="Choose image source">
+                    <button id="camera-button" class="capture-option active" type="button">
+                        <span class="camera-mark" aria-hidden="true"></span>
+                        Camera
+                    </button>
+                    <button id="upload-button" class="capture-option" type="button">
+                        <span class="upload-mark" aria-hidden="true"></span>
+                        Upload
+                    </button>
+                </div>
+                <p id="file-label" class="file-label">No image selected</p>
             </section>
 
-            <section class="controls">
-                <input id="image-input" type="file" accept="image/*">
-                <button id="analyze-button" type="button">Run Analysis</button>
-            </section>
+            <section id="chat-log" class="chat-log" aria-live="polite"></section>
+        </main>
 
-            <section class="chat">
-                <div id="chat-log" class="chat-log"></div>
-                <div class="chips">
-                    <button type="button" data-prompt="How many calories might this dish have?">Calories</button>
-                    <button type="button" data-prompt="What ingredients are likely in this dish?">Ingredients</button>
-                    <button type="button" data-prompt="Give one short nutrition suggestion.">Nutrition</button>
-                </div>
-                <form id="chat-form">
-                    <input id="chat-input" type="text" placeholder="Ask a follow-up question...">
-                    <button id="send-button" type="submit">Ask</button>
-                </form>
-            </section>
-        </section>
-    </main>
-    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+        <form id="chat-form" class="chat-form">
+            <input id="chat-input" type="text" placeholder="Message FoodLens..." autocomplete="off">
+            <button id="send-button" class="send-button" type="submit">Send</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}?v=20260626c" defer></script>
 </body>
 </html>

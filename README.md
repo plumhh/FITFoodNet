@@ -1,8 +1,8 @@
 # FITFoodNet
 
-Official implementation for the manuscript submitted to **The Visual Computer**:
+Official implementation associated with the manuscript:
 
-**Frequency-Aware Adaptive Modeling for Fine-Grained Food Visual Recognition**
+**Frequency-Aware Adaptive Modeling for Image-Based Fine-Grained Food Recognition and Characterization**
 
 This repository is directly associated with the above manuscript. If you use this code, benchmark protocol, or reproduced results, please cite the related manuscript. DOI: https://doi.org/10.5281/zenodo.20257839
 
@@ -18,7 +18,7 @@ This repository is directly associated with the above manuscript. If you use thi
 - Parameter, peak-memory, latency, and throughput profiling tools.
 - Occlusion-based feature sensitivity and dynamic-query heatmap visualization.
 - DINOv3 linear probe, full fine-tuning, Adapter, and AdaptFormer comparison scripts.
-- A lightweight FoodApp prototype used only to demonstrate the application scenario.
+- The mobile-oriented FoodLens prototype with a fixed label-conditioned DeepSeek protocol.
 
 ## Repository Structure
 
@@ -313,7 +313,7 @@ This repository does not include large model weights in Git history.
 
 ## FoodApp Prototype
 
-`examples/foodapp_prototype/` contains a lightweight prototype showing how FITFoodNet predictions can be connected to a prompt builder and optional large language model interface. This prototype is not required to reproduce benchmark results.
+`examples/foodapp_prototype/` contains the FoodLens prototype. FITFoodNet receives the food image and returns top-k labels; the LLM receives only those labels, confidence scores, and the user's question. The prototype is not required to reproduce benchmark results.
 
 ## Citation
 
@@ -321,11 +321,10 @@ If you use this repository, please cite the associated manuscript:
 
 ```bibtex
 @article{xiao2026fitfoodnet,
-  title   = {Frequency-Aware Adaptive Modeling for Fine-Grained Food Visual Recognition},
+  title   = {Frequency-Aware Adaptive Modeling for Image-Based Fine-Grained Food Recognition and Characterization},
   author  = {Xiao, Zhiyong and Li, Zihao and Deng, Zhaohong},
-  journal = {The Visual Computer},
   year    = {2026},
-  note    = {Manuscript submitted}
+  note    = {Manuscript}
 }
 ```
 

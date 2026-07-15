@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="22" y1="8" x2="104" y2="122" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE9A8"/>
+      <stop offset="0.58" stop-color="#F4A11A"/>
+      <stop offset="1" stop-color="#C56A00"/>
+    </linearGradient>
+    <filter id="s" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#A15E00" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="32" fill="url(#bg)"/>
+  <g filter="url(#s)">
+    <ellipse cx="64" cy="68" rx="38" ry="26" fill="#FFF8E8"/>
+    <ellipse cx="64" cy="68" rx="27" ry="16" fill="#F6DFA8"/>
+    <path d="M42 66c10-16 34-17 49-3 4 4 3 10-2 12-17 6-34 4-47-2-4-2-5-4 0-7Z" fill="#B85A00"/>
+    <path d="M47 62c11-10 28-10 39 0-10 5-27 6-39 0Z" fill="#E08800"/>
+    <circle cx="35" cy="80" r="6" fill="#DE3333"/>
+    <circle cx="95" cy="80" r="6" fill="#DE3333"/>
+    <path d="M30 57c8 0 14 2 20 7" stroke="#138A54" stroke-width="7" stroke-linecap="round"/>
+    <path d="M98 57c-8 0-14 2-20 7" stroke="#138A54" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <text x="64" y="101" text-anchor="middle" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#FFF8E8">FL</text>
+</svg>

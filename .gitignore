@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local configuration and secrets
+.env
+*.env
+!.env.example
+
+# Data, checkpoints, and generated outputs
+Models/
+models/
+imagedata/
+data/
+datasets/
+outputs/
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+
+# Local logs and temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

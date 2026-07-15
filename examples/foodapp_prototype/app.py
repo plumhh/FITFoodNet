@@ -1,4 +1,4 @@
-"""Flask prototype for FITFoodNet-based dietary feedback."""
+"""Flask prototype for FITFoodNet and label-conditioned food information."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 
 from predictor import ModelSetupError, PredictionError, PredictorService
-from prompt_builder import FoodAIService
+from food_ai import FoodAIError, FoodAIService
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -17,7 +17,7 @@ load_dotenv(BASE_DIR / ".env")
 
 app = Flask(__name__)
 predictor = PredictorService(repo_root=REPO_ROOT)
-food_ai = FoodAIService()
+food_ai = FoodAIService(evaluation_mode=True)
 
 
 @app.get("/")
@@ -31,6 +31,7 @@ def health():
         {
             "ok": True,
             "food_ai_configured": food_ai.configured,
+            "food_ai_protocol": food_ai.protocol_payload(),
             **predictor.status_payload(),
         }
     )
@@ -65,14 +66,29 @@ def predict():
 
 @app.post("/api/food-ai")
 def ask_food_ai():
-    payload = request.get_json(silent=True) or {}
-    reply = food_ai.ask(
-        message=payload.get("message", ""),
-        dish_name=payload.get("dish_name"),
-        predictions=payload.get("predictions") or [],
-    )
-    return jsonify({"ok": True, **reply})
+    try:
+        payload = request.get_json(silent=True) or {}
+        reply = food_ai.ask(
+            message=payload.get("message", ""),
+            dish_name=payload.get("dish_name"),
+            predictions=payload.get("predictions") or [],
+        )
+        return jsonify({"ok": True, **reply})
+    except FoodAIError as exc:
+        app.logger.warning("Food AI evaluation failed: %s", exc.code, exc_info=True)
+        return (
+            jsonify(
+                {
+                    "ok": False,
+                    "status": "failed",
+                    "error_type": exc.code,
+                    "message": str(exc),
+                    **food_ai.protocol_payload(),
+                }
+            ),
+            503,
+        )
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

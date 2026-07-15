@@ -1,76 +1,58 @@
-# FoodApp Prototype
+# FoodLens Prototype
 
-This directory provides a lightweight prototype that connects FITFoodNet to a
-mobile-oriented dietary-analysis workflow:
+FoodLens is the mobile-oriented application prototype associated with
+FITFoodNet. The browser sends a food image to the Flask server, FITFoodNet
+returns the top recognition candidates, and DeepSeek generates concise food
+information conditioned on those labels.
 
 ```text
-food image -> FITFoodNet prediction -> prompt builder -> LLM or local fallback -> dietary feedback
+food image -> FITFoodNet top-k labels -> fixed prompt protocol -> deepseek-chat
 ```
 
-The prototype is included to illustrate the application scenario discussed in
-the paper. It is not required for reproducing the benchmark results.
+The LLM does not receive the original image. It receives only the top-1 label,
+the top-3 labels with confidence scores, and the user's question. The fixed
+configuration and safety boundary are documented in `LLM_PROTOCOL.md`.
 
 ## Files
 
-- `app.py`: Flask API and web entry point.
-- `predictor.py`: FITFoodNet checkpoint loading and top-k prediction logic.
-- `prompt_builder.py`: prompt construction and LLM/local fallback response logic.
-- `templates/index.html`: mobile-style demo page.
-- `static/app.js`: frontend interaction logic.
-- `static/styles.css`: demo page styling.
-- `.env.example`: environment variable template.
+- `app.py`: Flask entry point and JSON API.
+- `predictor.py`: FITFoodNet checkpoint loading and top-k inference.
+- `food_ai.py`: fixed DeepSeek configuration, prompts, and failure handling.
+- `LLM_PROTOCOL.md`: reproducible LLM protocol and safety boundary.
+- `templates/index.html`: mobile-oriented FoodLens interface.
+- `static/app.js`: camera/upload and conversation workflow.
+- `static/styles.css`: responsive mobile styling.
 
-## Setup
+## Configuration
 
-Install the main repository environment first, then install the prototype-only
-dependencies:
+Install the repository environment and the prototype dependencies:
 
 ```bash
+pip install -r requirements.txt
 pip install -r examples/foodapp_prototype/requirements.txt
 ```
 
-Copy `.env.example` to `.env` or export the same variables in your shell:
+Copy `.env.example` to `.env`, then set local paths and the DeepSeek API key.
+Checkpoints, DINOv3 weights, datasets, uploaded images, and API keys must not be
+committed to the repository.
 
-```bash
-FITFOODNET_CHECKPOINT=/path/to/fitfoodnet_best.pth
-FITFOODNET_CLASS_JSON=/path/to/class_indices.json
-FITFOODNET_NUM_CLASSES=172
-FITFOODNET_DINOV3_REPO=/path/to/dinov3
-FITFOODNET_DINOV3_SOURCE=local
-FITFOODNET_DINOV3_WEIGHT=/path/to/dinov3_vitl16_pretrain.pth
-```
-
-LLM access is optional. If no API key is configured, the app returns a local
-fallback response:
-
-```bash
-OPENAI_API_KEY=your_api_key_here
-OPENAI_BASE_URL=https://api.openai.com/v1
-OPENAI_MODEL=gpt-4o-mini
-```
-
-DeepSeek-compatible variables are also supported:
-
-```bash
-DEEPSEEK_API_KEY=your_api_key_here
-DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-chat
-```
+The class JSON file may be either a list of class names or an index-to-name
+mapping. `FITFOODNET_NUM_CLASSES` must match the checkpoint classifier.
 
 ## Run
+
+From the repository root:
 
 ```bash
 python examples/foodapp_prototype/app.py
 ```
 
-Then open:
+Open `http://127.0.0.1:5000` on the same computer. For a phone on the same
+local network, open `http://<computer-lan-ip>:5000`.
 
-```text
-http://127.0.0.1:5000
-```
+## Scope
 
-## Notes
-
-- Do not commit `.env`, uploaded images, checkpoints, or API keys.
-- This prototype uses fixed image-level classification. It does not implement
-  portion estimation, multi-food detection, or user-study functionality.
+FoodLens is a research prototype for fine-grained food recognition and
+label-conditioned food information generation. It does not verify hidden
+allergens, cross-contamination, exact nutrient quantities, portion size,
+dietary compliance, or clinical suitability.

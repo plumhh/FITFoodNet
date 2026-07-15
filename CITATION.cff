@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this code, benchmark protocol, or reproduced results, please cite the associated manuscript submitted to The Visual Computer."
+message: "If you use this code, benchmark protocol, or reproduced results, please cite the associated manuscript."
 title: "FITFoodNet: Reproducible implementation for frequency-aware adaptive modeling"
 authors:
   - family-names: Xiao
@@ -13,7 +13,7 @@ url: "https://github.com/plumhh/FITFoodNet"
 date-released: "2026-05-17"
 preferred-citation:
   type: article
-  title: "Frequency-Aware Adaptive Modeling for Fine-Grained Food Visual Recognition"
+  title: "Frequency-Aware Adaptive Modeling for Image-Based Fine-Grained Food Recognition and Characterization"
   authors:
     - family-names: Xiao
       given-names: Zhiyong
@@ -21,5 +21,4 @@ preferred-citation:
       given-names: Zihao
     - family-names: Deng
       given-names: Zhaohong
-  journal: "The Visual Computer"
   year: 2026
